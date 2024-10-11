@@ -23,24 +23,25 @@ jobs:
       name: github-pages
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # fetch all commits/branches
-#      - name: Checkout repo
-#        run: |
-#          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/davidkel/test-calip $GITHUB_WORKSPACE
+#      - uses: actions/checkout@v3
+#        with:
+#          fetch-depth: 0 # fetch all commits/branches
+      - name: Checkout repo
+        run: |
+          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/davidkel/test-calip $GITHUB_WORKSPACE
       - name: Configure git user and test access
         run: |
           cat .git/config
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          echo "new data" >> newfile.txt
+          git checkout gh-pages
+          echo "new data 3" >> newfile.txt
           echo "adding changed files"
           git add .
           echo "committing"
           git commit -m "a new commit"
           echo "pushing"
-          git push origin HEAD:main
+          git push origin HEAD:gh-pages
 #          echo "https://x-access-token:1234@github.com" > ~/.git-credentials
 #          git config --global credential.helper store
       - uses: actions/setup-python@v4
