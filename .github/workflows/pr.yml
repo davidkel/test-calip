@@ -1,9 +1,0 @@
-name: Pages CI (PR)
-
-on:
-  pull_request:
-    branches: [ "gh-pages" ]
-
-jobs:
-  dci-lint:
-    uses: ./.github/workflows/dci.yml
