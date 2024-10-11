@@ -15,11 +15,34 @@ permissions:
 
 jobs:
   deploy:
+    permissions:
+        pages: write
+        id-token: write
+        contents: write
+    environment:
+      name: github-pages
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # fetch all commits/branches
+#      - name: Checkout repo
+#        run: |
+#          git clone https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/davidkel/test-calip $GITHUB_WORKSPACE
+      - name: Configure git user and test access
+        run: |
+          cat .git/config
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          echo "new data" >> newfile.txt
+          echo "adding changed files"
+          git add .
+          echo "committing"
+          git commit -m "a new commit"
+          echo "pushing"
+          git push origin HEAD:main
+#          echo "https://x-access-token:1234@github.com" > ~/.git-credentials
+#          git config --global credential.helper store
       - uses: actions/setup-python@v4
         with:
           python-version: 3.x
@@ -29,11 +52,6 @@ jobs:
           path: .cache
       - name: Install Python dependencies
         run: pip install -r ./docs/pip-requirements.txt
-      - name: Configure git user
-        run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-
       - name: Deploy docs
         run: |
           # Strip git ref prefix from version
@@ -44,5 +62,9 @@ jobs:
           # If building from main, use vNext as ALIAS
           [ "$VERSION" == "main" ] && ALIAS=vNext
           echo $VERSION $ALIAS
-          mike deploy --push --update-aliases $VERSION $ALIAS
-          mike set-default vNext
+          cd docs
+          mike delete --all
+          mike deploy --push --update-aliases $ALIAS
+          mike set-default vNext --push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
